@@ -4,7 +4,7 @@ sidebar_label: Docker
 
 # Doom 3 Docker Container
 
-This Docker container runs a Doom 3 dedicated server. It is built on the base image and runs the dedicated server of [dhewm3](https://dhewm3.org/) 1.5.2 (`dhewm3ded`), which the image compiles from source. You supply the retail game data.
+This Docker container runs a Doom 3 dedicated server. It is built on the base image and runs the dedicated server of [dhewm3](https://dhewm3.org/) (`dhewm3ded`), which the image compiles from the latest dhewm3 release at build time (`DHEWM3_VERSION` pins one). You supply the retail game data.
 
 ## Quick Start
 
@@ -84,6 +84,6 @@ Put `.ps1` scripts in `config/Scripts/Hooks/<HookName>/` to run at the base imag
 
 - **`base/pak000.pk4 not found`**: the retail game data isn't in `Server/`. Copy `base/` (and `d3xp/`) from a Doom 3 install.
 - **Clients get "pure" or checksum errors**: client and server need the same `.pk4` files. Give clients the same paks, or set `D3_PURE=0`.
-- **Clients can't connect**: clients should run dhewm3 1.5.2, the same version as the server. The original Doom 3 executables and other dhewm3 versions are untested.
+- **Clients can't connect**: clients need dhewm3 1.5.x. Every 1.5.x release uses network protocol 1.42, so mixed 1.5.x versions should work, but the same version on both sides is the safest. The original Doom 3 executables are untested. `cat /opt/dhewm3/VERSION` in the container shows the server's version.
 - **Server not in the LAN browser**: the browser finds servers by UDP broadcast, so the container needs its own LAN address (macvlan/ipvlan) or host networking. With port mapping, clients join by IP (`connect <ip>:27666` in the console).
 - **`D3_MAX_PLAYERS` capped at 4**: Doom 3 allows at most 4 players; Resurrection of Evil (`D3_GAME=d3xp`) allows 8.
