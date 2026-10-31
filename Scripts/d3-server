@@ -1,0 +1,42 @@
+#!/bin/sh
+# Start the Doom 3 dedicated server (START_EXE).
+#
+# Runs `dhewm3ded +set fs_game <D3_GAME> +set net_port <D3_PORT> +exec lancommander.cfg
+# +spawnServer` with the server root as base, save and config path, so the game data comes
+# from Merged/ and everything the server writes lands in Overlay/. Any START_ARGS are appended
+# before +spawnServer.
+set -e
+
+root="${SERVER_ROOT:-/config/Merged}"
+game="${D3_GAME:-base}"
+
+cd "$root"
+
+if [ ! -f base/pak000.pk4 ]; then
+    echo "base/pak000.pk4 not found in $root; copy the retail Doom 3 base/ (and d3xp/) folders into /config/Server" >&2
+    exit 1
+fi
+
+# fs_game is for mods; base is the default and must not be set
+mod=
+[ "$game" = base ] || mod="+set fs_game $game"
+
+lan=0
+case "${D3_LAN:-true}" in
+    true|1|yes) lan=1 ;;
+esac
+
+set -- /opt/dhewm3/dhewm3ded \
+    +set fs_basepath "$root" \
+    +set fs_savepath "$root" \
+    +set fs_configpath "$root" \
+    $mod \
+    +set net_port "${D3_PORT:-27666}" \
+    +set net_LANServer "$lan" \
+    +exec lancommander.cfg \
+    "$@" \
+    +spawnServer
+
+echo "Starting: $*"
+
+exec "$@"
